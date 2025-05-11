@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anneme Özel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --panel-width: 95vw;
+      --panel-height: 95vh;
+      --transition-duration: 2500ms;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Playfair Display', serif;
+      overflow: hidden;
+      background: linear-gradient(45deg, 
+        #ffafbd, #ffc3a0, #ffd194, 
+        #ffe39f, #c2e9fb, #a1c4fd
+      );
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .panel {
+      width: var(--panel-width);
+      height: var(--panel-height);
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity var(--transition-duration) ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .slide.active {
+      opacity: 1;
+    }
+
+    .slide img {
+      max-width: 100%;
+      max-height: 80%;
+      object-fit: contain;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .caption {
+      margin-top: 20px;
+      color: white;
+      font-family: 'Dancing Script', cursive;
+      font-size: 2.5rem;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px 20px;
+      border-radius: 15px;
+      text-align: center;
+    }
+
+    .emoji-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .emoji {
+      position: absolute;
+      font-size: 20px;
+      user-select: none;
+      will-change: transform;
+      z-index: 1;
+      animation: emojiRain 3s linear forwards;
+    }
+
+    @keyframes emojiRain {
+      0% {
+        transform: translateY(-20px) rotate(0deg);
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    @keyframes confettiRain {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    .music-control {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(5px);
+      border: none;
+      border-radius: 50%;
+      width: 3.5rem;
+      height: 3.5rem;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+
+    .music-control:hover {
+      transform: scale(1.1) rotate(15deg);
+    }
+  </style>
+</head>
+<body>
+  <button class="music-control" id="musicToggle">🎵</button>
+  <audio id="bgMusic" loop>
+    <source src="images/en-güzel-anneler-günü-şarkisi--canim-anneciğim.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="panel" id="panel"></div>
+  <div class="emoji-container" id="emojiContainer"></div>
+
+  <script>
+    const emojis = [
+      '🥰', '🤗', '🧡', '💛', '💚', '💙', '💜', 
+      '👶', '👸', '🦸‍♀️', '🌹', '🌸', '🌺', '🌻',
+      '🌼', '🌷', '🍫','🌹', '💝', '💖', '💕', 
+      '💗','💓', '💞', '💘', '💟'
+    ];
+
+    const captions = [
+      'birtane annem',
+      'Canım Annem',
+      'İyi ki Varsın',
+      'Seni Çok Seviyorum',
+      'Dünyanın En İyi Annesi',
+      'Meleğim Benim',
+      'Biricik Annem',
+      'Hayatımın Anlamı',
+      'Kalbimin Sultanı',
+      'En Değerlim',
+      'Canımın Parçası',
+      'Güzel Annem',
+      'Nur Yüzlüm',
+      'Cennetim',
+      'Gönlümün Tacı',
+      'Bitanem',
+      'Hayat Işığım',
+      'Güneşim',
+      'Canım Anneciğim',
+      'Meleğim',
+      'Kalbimin Sahibi',
+      'Gözümün Nuru',
+      'Baş Tacım',
+      'Sevgi Pınarım',
+      'Huzurum',
+      'Mutluluğum',
+      'Yaşama Sebebim',
+      'Kalbimdeki Melek',
+      'Sevgi Kaynağım',
+      'Hayatımın Anlamı',
+      'Seni Çok Seviyorum Annem'
+    ];
+
+    const imageCount = 31;
+    let currentSlide = 0;
+    let isTransitioning = false;
+    let autoPlayInterval;
+    let isLastSlide = false;
+
+    function createSlides() {
+      const panel = document.getElementById('panel');
+      for (let i = 0; i < imageCount; i++) {
+        const slide = document.createElement('div');
+        slide.className = 'slide';
+        
+        const img = document.createElement('img');
+        img.src = `images/photo${i + 1}.png`;
+        img.alt = `Annem ${i + 1}`;
+
+        img.onerror = function() {
+          this.src = `images/photo${i}.png`;
+        };
+        
+        const caption = document.createElement('div');
+        caption.className = 'caption';
+        caption.textContent = captions[i];
+        
+        img.src = `images/photo${i}.jpeg`;
+        slide.appendChild(img);
+        slide.appendChild(caption);
+        panel.appendChild(slide);
+      }
+    }
+
+    function createFallingEmoji() {
+      const emoji = document.createElement('div');
+      emoji.className = 'emoji';
+      emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      emoji.style.left = `${Math.random() * 100}%`;
+      
+      const container = document.getElementById('emojiContainer');
+      container.appendChild(emoji);
+
+      emoji.addEventListener('animationend', () => {
+        emoji.remove();
+      });
+    }
+
+    function createConfetti(count, isLeft) {
+      for (let i = 0; i < count; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = isLeft ? '10%' : '90%';
+        confetti.style.backgroundColor = `hsl(${Math.random() * 360}deg, 100%, 50%)`;
+        confetti.style.animation = `confettiRain ${2 + Math.random() * 2}s linear forwards`;
+        document.body.appendChild(confetti);
+
+        confetti.addEventListener('animationend', () => {
+          confetti.remove();
+        });
+      }
+    }
+
+    function showSlide(index) {
+      if (isTransitioning || (isLastSlide && index >= imageCount - 1)) return;
+      isTransitioning = true;
+
+      const slides = document.querySelectorAll('.slide');
+      slides.forEach(slide => slide.classList.remove('active'));
+      slides[index].classList.add('active');
+
+      if (index === imageCount - 1 && !isLastSlide) {
+        isLastSlide = true;
+        clearInterval(autoPlayInterval);
+        createConfetti(50, true);
+        createConfetti(50, false);
+      }
+
+      setTimeout(() => {
+        isTransitioning = false;
+      }, 1000);
+
+      currentSlide = index;
+    }
+
+    function handleScroll(event) {
+      if (isTransitioning) return;
+      
+      const delta = event.deltaY;
+      if (delta > 0 && currentSlide < imageCount - 1) {
+        showSlide(currentSlide + 1);
+      } else if (delta < 0 && currentSlide > 0) {
+        showSlide(currentSlide - 1);
+      }
+    }
+
+    // Initialize
+    createSlides();
+    document.querySelectorAll('.slide')[0].classList.add('active');
+
+    // Start falling emojis
+    setInterval(createFallingEmoji, 300);
+
+    // Auto advance slides
+    autoPlayInterval = setInterval(() => {
+      if (!isLastSlide && currentSlide < imageCount - 1) {
+        showSlide(currentSlide + 1);
+      }
+    }, 2500);
+
+    // Event listeners
+    window.addEventListener('wheel', handleScroll);
+
+    // Music controls
+    const musicToggle = document.getElementById('musicToggle');
+    const bgMusic = document.getElementById('bgMusic');
+
+    musicToggle.addEventListener('click', () => {
+      if (bgMusic.paused) {
+        bgMusic.play();
+        musicToggle.textContent = '🎵';
+      } else {
+        bgMusic.pause();
+        musicToggle.textContent = '🔇';
+      }
+    });
+
+    window.addEventListener('load', () => {
+      bgMusic.play().catch(() => {
+        musicToggle.textContent = '🔇';
+      });
+    });
+  </script>
+</body>
+</html>
