@@ -166,7 +166,7 @@
 <body>
   <button class="music-control" id="musicToggle">🎵</button>
   <audio id="bgMusic" loop>
-    <source src="./images/en-güzel-anneler-günü-şarkisi--canim-anneciğim.mp3" type="audio/mpeg">
+    <source src="images/en-güzel-anneler-günü-şarkisi--canim-anneciğim.mp3" type="audio/mpeg">
   </audio>
 
   <div class="panel" id="panel"></div>
@@ -227,18 +227,18 @@
         slide.className = 'slide';
         
         const img = document.createElement('img');
-        img.src = `./images/photo${i + 1}.png`;
+        img.src = `images/photo${i + 1}.png`;
         img.alt = `Annem ${i + 1}`;
 
         img.onerror = function() {
-          this.src = `./images/photo${i}.png`;
+          this.src = `images/photo${i}.png`;
         };
         
         const caption = document.createElement('div');
         caption.className = 'caption';
         caption.textContent = captions[i];
         
-        img.src = `./images/photo${i}.jpeg`;
+        img.src = `images/photo${i}.jpeg`;
         slide.appendChild(img);
         slide.appendChild(caption);
         panel.appendChild(slide);
@@ -324,6 +324,25 @@
     // Event listeners
     window.addEventListener('wheel', handleScroll);
 
+    // Music controls
+    const musicToggle = document.getElementById('musicToggle');
+    const bgMusic = document.getElementById('bgMusic');
+
+    musicToggle.addEventListener('click', () => {
+      if (bgMusic.paused) {
+        bgMusic.pause();
+        musicToggle.textContent = '🎵';
+      } else {
+        bgMusic.play();
+        musicToggle.textContent = '🔇';
+      }
+    });
+
+    window.addEventListener('load', () => {
+      bgMusic.play().catch(() => {
+        musicToggle.textContent = '🔇';
+      });
+    });
   </script>
 </body>
 </html>
