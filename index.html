@@ -332,17 +332,9 @@
       if (bgMusic.paused) {
         bgMusic.play();
         musicToggle.textContent = '🎵';
-      } else {
-        bgMusic.pause();
-        musicToggle.textContent = '🔇';
-      }
+
     });
 
-    window.addEventListener('load', () => {
-      bgMusic.play().catch(() => {
-        musicToggle.textContent = '🔇';
-      });
-    });
   </script>
 </body>
 </html>
