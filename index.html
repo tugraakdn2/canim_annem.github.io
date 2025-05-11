@@ -329,13 +329,13 @@
     const bgMusic = document.getElementById('bgMusic');
 
     musicToggle.addEventListener('click', () => {
-      if {
-        bgMusic.pause();
-        musicToggle.textContent = '🔇';
-      } else (bgMusic.paused) {
+      if (bgMusic.paused) {
         bgMusic.play();
         musicToggle.textContent = '🎵';
-      } 
+      } else {
+        bgMusic.pause();
+        musicToggle.textContent = '🔇';
+      }
     });
 
     window.addEventListener('load', () => {
